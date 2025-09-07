@@ -1,0 +1,5 @@
+.ptvenv/
+.chromadb/
+__pycache__/
+*.onnx
+*.log
