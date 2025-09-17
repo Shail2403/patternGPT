@@ -11,3 +11,4 @@ async def health():
 @app.get("/")
 async def root():
     return {"msg":"patternGPT backend running...  /health for status."}
+

@@ -14,7 +14,7 @@ Steps:
 
 
 import argparse
-import numpy
+import numpy as np
 import onnxruntime as ort
 from transformers import AutoTokenizer
 import chromadb
@@ -45,28 +45,27 @@ class OnnxEmbedder:
         norms = np.linalg.norm(sentence_embeddings, axis=1, keepdims=True)
         return sentence_embeddings / np.maximum(norms, 1e-10)
         
-    def query_patterns(query,top_k=3,db_path="./.chromadb"):
-        embedder=OnnxEmbedder()
-        query_emb=embedder.encode([query])[0]
-        client=chromadb.PersistentClient(path=db_path)
-        col=client.get_collection("patterns")
-        results=col.query(query_embeddings=[query_emb.tolist()],n_results=top_k)
-        
-        return results
+def query_patterns(query,top_k=3,db_path="./.chromadb"):
+    embedder=OnnxEmbedder()
+    query_emb=embedder.encode([query])[0]
+    client=chromadb.PersistentClient(path=db_path)
+    col=client.get_collection("patterns")
+    results=col.query(query_embeddings=[query_emb.tolist()],n_results=top_k)
     
-    if __name__ == "__main__":
-        parser = argparse.ArgumentParser()
-        parser.add_argument("--query", type=str, required=True, help="Search query text")
-        parser.add_argument("--top_k", type=int, default=3, help="Number of results to retrieve")
-        args = parser.parse_args()
+    return results
 
-        hits = query_patterns(args.query, args.top_k)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--query", type=str, required=True, help="Search query text")
+    parser.add_argument("--top_k", type=int, default=3, help="Number of results to retrieve")
+    args = parser.parse_args()
 
-        print(f"\nTop {args.top_k} results for query: '{args.query}'\n")
-        for i in range(len(hits["documents"][0])):
-            print(f"Result {i+1}:")
-            print("Metadata:", hits["metadatas"][0][i])
-            print("Text preview:", hits["documents"][0][i][:300])
-            print("-" * 40)
+    hits = query_patterns(args.query, args.top_k)
 
-    
+    print(f"\nTop {args.top_k} results for query: '{args.query}'\n")
+    for i in range(len(hits["documents"][0])):
+        print(f"Result {i+1}:")
+        print("Metadata:", hits["metadatas"][0][i])
+        print("Text preview:", hits["documents"][0][i][:300])
+        print("-" * 40)
+

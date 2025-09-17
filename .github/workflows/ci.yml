@@ -1,0 +1,40 @@
+name: PatternGPT CI
+
+on:
+  push:
+    branches:
+      - main    # Run on push to main
+  workflow_dispatch:  # Allow manual runs with custom input
+    inputs:
+      query:
+        description: "Pattern query to test"
+        required: false
+        default: "triangle star pattern"
+
+jobs:
+  run-pattern-answerer:
+    runs-on: ubuntu-latest
+
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Run Pattern Answerer with dynamic query
+        run: |
+          source .venv/bin/activate
+          python backend/pattern_answerer.py --query "${{ github.event.inputs.query }}" --top_k 3
+
