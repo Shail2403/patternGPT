@@ -11,7 +11,7 @@ from pattern_retriever import query_patterns
 # Initialize OpenRouter client
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key="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"
+    api_key="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"
 )
 
 def call_mistral_model(prompt: str) -> str:
